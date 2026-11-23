@@ -103,4 +103,10 @@ const route=()=>{
  document.querySelectorAll('.lang a').forEach(a=>{a.href=a.dataset.base+(views.includes(h)?'#'+h:'')});
 };
 window.addEventListener('hashchange',route);route();
+// top bar: one row when it fits, otherwise title + language on top and tabs below
+const bar=document.querySelector('.topbar .in');
+const fit=()=>{bar.classList.remove('stack');if(bar.scrollWidth>bar.clientWidth+1)bar.classList.add('stack')};
+const barRO=new ResizeObserver(fit);barRO.observe(document.body);
+if(document.fonts)document.fonts.ready.then(fit);
+fit();
 }
