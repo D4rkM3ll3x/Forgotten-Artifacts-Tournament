@@ -167,6 +167,21 @@ footer{padding:8mm 4mm}
 .tcard .dc{overflow-wrap:anywhere}
 .tcard h4{padding-bottom:8px;border-bottom:1px solid var(--steel);color:var(--steel);font-weight:700}
 #v-teams .tag{color:var(--steel);border-color:var(--steel)}
+.tlay{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:32px;align-items:start}
+.tlay section{padding-top:10px}
+.tlay .teams{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+.cnt{font-size:.6em;color:var(--mute);font-weight:600;vertical-align:middle}
+.soloc{position:sticky;top:84px}
+.solo{margin-top:14px}
+.solo ul{list-style:none;padding:0;margin:0}
+.solo li{margin:0;padding:10px 0;border-bottom:1px solid var(--edge);font-size:15px;line-height:1.4}
+.solo li:first-child{padding-top:0}
+.solo li>b{color:var(--steel)}
+.solo .sf{display:block;color:var(--ink)}
+.solo .sd{display:block;font-size:13px;color:var(--mute);overflow-wrap:anywhere}
+.solo .ver{margin:10px 0 0;font-size:13px;line-height:1.45}
+.solo h3{margin:0}
+@media(max-width:900px){.tlay{grid-template-columns:minmax(0,1fr);gap:0}.soloc{position:static}}
 .tbdn{color:var(--mute);font-style:italic;font-weight:400}
 .ab{display:block;font:600 12px/1.2 Cinzel,serif;color:var(--mute);margin-bottom:2px}
 .mini div>span:first-child{display:flex;align-items:baseline}
@@ -375,12 +390,22 @@ aside nav a:hover,aside nav a:focus-visible{border-left-color:var(--steel) !impo
  <header><div class="wrapc">
   <h1>Teams</h1>
   <p class="lead">Registered teams · Contact your opponents via Discord to schedule each match.</p>
-  <p class="sample">Sample data: will be updated after the sign-up phase is finished</p>
+  <p class="sample">Sign-ups are open · this list is updated as players register</p>
  </div></header>
  <main class="wrapc">
-  <section>
-   <div class="teams" id="teams"></div>
-  </section>
+  <div class="tlay">
+   <section>
+    <h2>Teams <span class="cnt" id="tcount"></span></h2>
+    <div class="teams" id="teams"></div>
+   </section>
+   <section class="soloc">
+    <h2>Solo players <span class="cnt" id="scount"></span></h2>
+    <div class="box solo">
+     <ul id="solo"></ul>
+     <p class="ver">Registered without a team. Solo players can ask the organizer for help forming a team, or step in as a replacement.</p>
+    </div>
+   </section>
+  </div>
  </main>
 </div>
 
@@ -434,20 +459,19 @@ aside nav a:hover,aside nav a:focus-visible{border-left-color:var(--steel) !impo
 <footer><div class="col">Forgotten Artifacts Tournament · fan-run community event, not affiliated with Games Workshop, Proxy Studios or Slitherine.<br>Made by M3ll3x</div></footer>
 <script>
 {
+// teams: [in-game name, faction, Discord]; '' = not given yet
 const T={
- a:{n:'Rust & Ruin',p:[['Kaelith','Necrons','kaelith'],['Morv','Orks','morv.waaagh']]},
- b:{n:'Sons of the Ninth Pylon',p:[['Varro','Space Marines','varro_ix'],['Dux','Astra Militarum','dux.lineholder']]},
- c:{n:'The Ashen Choir',p:[['Selene','Adepta Sororitas','selene.choir'],['Orrin','T\'au','orrin_shasui']]},
- d:{n:'Void Wardens',p:[['Hask','Drukhari','hask'],['Imra','Craftworld Aeldari','imra.seer']]},
- e:{n:'Gloomhold Raiders',p:[['Brakk','Orks','brakk_gloom'],['Ferro','Adeptus Mechanicus','ferro.cog']]},
- f:{n:'Iron Psalm',p:[['Cassian','Adeptus Mechanicus','cassian.omni'],['Rhee','Necrons','rhee']]},
- g:{n:'Crimson Tithe',p:[['Vael','Chaos Space Marines','vael_tithe'],['Nox','Tyranids','nox.swarm']]},
- h:{n:'Pale Harvest',p:[['Mira','Tyranids','mira.harvest'],['Tolk','Chaos Space Marines','tolk']]},
- i:{n:'Ember Covenant',p:[['Aurel','Space Marines','aurel.ember'],['Jun','T\'au','jun_kauyon']]},
- j:{n:'Black Spire',p:[['Grell','Astra Militarum','grell.spire'],['Sabe','Drukhari','sabe']]},
- k:{n:'Shard Reavers',p:[['Ysolde','Craftworld Aeldari','ysolde.shard'],['Quill','Orks','quill_reaver']],wc:1},
- l:{n:'Last Lantern',p:[['Oswin','Adepta Sororitas','oswin.lantern'],['Tarn','Necrons','tarn']],wc:1}
+ a:{n:'Anglo-Soviet Treaty of 1942',p:[['Thentox','Astra Militarum','Thentox'],['Exarsist','Adeptus Mechanicus','exarsist']]},
+ b:{n:'Team R',p:[['Гробовщик','Orks','.slizen'],['дядя ugrep','Space Marines','ugrep']]},
+ c:{n:'What / Question',p:[['Who','Adeptus Mechanicus','fonrir'],['Why','Space Marines','pepsioriginal']]},
+ d:{n:'Azure Legion of Phobetor',p:[['ddutch.guyy','Astra Militarum','Dutch_Guy'],['Peikko13','','Peikko13']]},
+ e:{n:'Space gypsies',p:[['ВАГХ','Chaos Space Marines','HUNTE44'],['Shishkosvin','Craftworld Aeldari','andruxavelichajshijizandrux']]}
 };
+// solo players without a team: [in-game name, faction, Discord, note]
+const S=[
+ ['OldManSart','Craftworld Aeldari','sart_rts',''],
+ ['icestorm845','Adeptus Mechanicus','mothmanhighpriest','']
+];
 T._={n:'TBD',p:[],ph:1};
 const pl=k=>T[k].p.map(x=>x[0]+' ('+x[1]+')').join(' · ');
 // [teamA, teamB, winner or '', status text]
@@ -465,7 +489,11 @@ R.forEach(ms=>{
  ms.forEach(m=>{if(!m[2])return;const w=m[2],l=m[0]===w?m[1]:m[0];rec[w][0]++;rec[l][1]++;form[w].push('W');form[l].push('L')});
 });
 // registered teams
-document.getElementById('teams').innerHTML=Object.keys(T).filter(k=>!T[k].ph).sort((x,y)=>T[x].n.localeCompare(T[y].n)).map(k=>`<div class="box tcard"><h4>${nm(k)}</h4><table><thead><tr><th>Player</th><th>Faction</th><th>Discord</th></tr></thead><tbody>${T[k].p.map(x=>`<tr><td>${esc(x[0])}</td><td>${esc(x[1])}</td><td class="dc">${esc(x[2])}</td></tr>`).join('')}</tbody></table></div>`).join('');
+const opt=x=>x?esc(x):'<span class="tbdn">?</span>';
+document.getElementById('teams').innerHTML=Object.keys(T).filter(k=>!T[k].ph).sort((x,y)=>T[x].n.localeCompare(T[y].n)).map(k=>`<div class="box tcard"><h4>${nm(k)}</h4><table><thead><tr><th>Player</th><th>Faction</th><th>Discord</th></tr></thead><tbody>${T[k].p.map(x=>`<tr><td>${esc(x[0])}</td><td>${opt(x[1])}</td><td class="dc">${opt(x[2])}</td></tr>`).join('')}</tbody></table></div>`).join('');
+document.getElementById('tcount').textContent=Object.keys(T).filter(k=>!T[k].ph).length;
+document.getElementById('scount').textContent=S.length;
+document.getElementById('solo').innerHTML=S.length?S.map(x=>`<li><b>${esc(x[0])}</b>${x[3]?` <span class="tag">${esc(x[3])}</span>`:''}<span class="sf">${opt(x[1])}</span><span class="sd">Discord: ${opt(x[2])}</span></li>`).join(''):'<li class="sd">No solo players at the moment.</li>';
 // swiss overview
 const sw=document.getElementById('swiss');
 sw.innerHTML=R.map((ms,i)=>{
