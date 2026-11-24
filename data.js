@@ -7,7 +7,9 @@ const T={
  b:{n:'Team R',p:[['Гробовщик','Orks','.slizen'],['дядя ugrep','Space Marines','ugrep']]},
  c:{n:'What',p:[['Who','Adeptus Mechanicus','fonrir'],['Why','Space Marines','pepsioriginal']]},
  d:{n:'Azure Legion of Phobetor',p:[['ddutch.guyy','Astra Militarum','Dutch_Guy'],['Peikko13','','Peikko13']]},
- e:{n:'Space gypsies',p:[['ВАГХ','Chaos Space Marines','HUNTE44'],['Shishkosvin','Craftworld Aeldari','andruxavelichajshijizandrux']]}
+ e:{n:'Space gypsies',p:[['ВАГХ','Chaos Space Marines','HUNTE44'],['Shishkosvin','Craftworld Aeldari','andruxavelichajshijizandrux']]},
+ f:{n:'Daughters of the Four-Armed Emperor',p:[['Greed','Adepta Sororitas','Greed'],['Creme','Tyranids','CremeBrouillet']]},
+ g:{n:'Gorky Boyz',p:[['Skifling','Craftworld Aeldari','Skifling'],['SHYMASTORM','Orks','SHYMASTORM']]}
 };
 
 // Solo players without a team: [in-game name, faction, Discord, note]

@@ -37,10 +37,14 @@ const L={
   thPlayer:'Игрок',thFaction:'Фракция',thDiscord:'Discord'
  }
 }[lang];
+// faction names per language (data.js uses the English names)
+const FX={ru:{'Necrons':'Некроны','Space Marines':'Космический десант','Astra Militarum':'Имперская Гвардия','Orks':'Орки','Tyranids':'Тираниды','Chaos Space Marines':'Космодесант Хаоса',"T'au":'Тау','Craftworld Aeldari':'Крафтворлдские Эльдары','Adeptus Mechanicus':'Адептус Механикус','Adepta Sororitas':'Сёстры Битвы','Drukhari':'Друкхари'}}[lang]||{};
+const fxn=f=>FX[f]||f;
 T._={n:'TBD',p:[],ph:1};
 const esc=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
 const opt=x=>x?esc(x):'<span class="tbdn">?</span>';
-const pl=k=>T[k].p.map(x=>x[0]+' ('+(x[1]||'?')+')').join(' · ');
+const optF=x=>opt(x&&fxn(x));
+const pl=k=>T[k].p.map(x=>x[0]+' ('+(x[1]?fxn(x[1]):'?')+')').join(' · ');
 const nm=k=>(T[k].ph?'<span class="tbdn">'+L.tbd+'</span>':esc(T[k].n))+(T[k].wc?' <span class="tag">WC</span>':'');
 const stTxt=s=>s==='Not scheduled yet'?L.notSched:s;
 // record before each round
@@ -52,10 +56,10 @@ R.forEach(ms=>{
 });
 // registered teams and solo players
 const real=Object.keys(T).filter(k=>!T[k].ph);
-document.getElementById('teams').innerHTML=real.slice().sort((x,y)=>T[x].n.localeCompare(T[y].n)).map(k=>`<div class="box tcard"><h4>${nm(k)}</h4><table><thead><tr><th>${L.thPlayer}</th><th>${L.thFaction}</th><th>${L.thDiscord}</th></tr></thead><tbody>${T[k].p.map(x=>`<tr><td>${esc(x[0])}</td><td>${opt(x[1])}</td><td class="dc">${opt(x[2])}</td></tr>`).join('')}</tbody></table></div>`).join('');
+document.getElementById('teams').innerHTML=real.slice().sort((x,y)=>T[x].n.localeCompare(T[y].n)).map(k=>`<div class="box tcard"><h4>${nm(k)}</h4><table><thead><tr><th>${L.thPlayer}</th><th>${L.thFaction}</th><th>${L.thDiscord}</th></tr></thead><tbody>${T[k].p.map(x=>`<tr><td>${esc(x[0])}</td><td>${optF(x[1])}</td><td class="dc">${opt(x[2])}</td></tr>`).join('')}</tbody></table></div>`).join('');
 document.getElementById('tcount').textContent=real.length;
 document.getElementById('scount').textContent=S.length;
-document.getElementById('solo').innerHTML=S.length?S.map(x=>`<li><b>${esc(x[0])}</b>${x[3]?` <span class="tag">${esc(x[3])}</span>`:''}<span class="sf">${opt(x[1])}</span><span class="sd">${L.discord}: ${opt(x[2])}</span></li>`).join(''):`<li class="sd">${L.soloEmpty}</li>`;
+document.getElementById('solo').innerHTML=S.length?S.map(x=>`<li><b>${esc(x[0])}</b>${x[3]?` <span class="tag">${esc(x[3])}</span>`:''}<span class="sf">${optF(x[1])}</span><span class="sd">${L.discord}: ${opt(x[2])}</span></li>`).join(''):`<li class="sd">${L.soloEmpty}</li>`;
 // swiss overview
 const sw=document.getElementById('swiss');
 sw.innerHTML=R.map((ms,i)=>{
