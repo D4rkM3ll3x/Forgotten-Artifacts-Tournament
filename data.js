@@ -13,16 +13,16 @@ const T={
  h:{n:'The B-Team',p:[['Johannes',"T'au",'Johannes'],['Blizzard','Craftworld Aeldari','Blizzard']]},
  i:{n:'Goal: one win',p:[['Saganaki117','Space Marines','xraptor117'],['hirondelle_3000','Adeptus Mechanicus','hirondelle_3000']]},
  j:{n:'Skill Issue',p:[['M3ll3x','Drukhari','M3ll3x'],['Fuziorak','Necrons','Fuziorak'],['peppi','Adepta Sororitas','peppi33']]},
- k:{n:'T36 Planes or GG',p:[['Nitro','Drukhari','koji._.'],['Graffy','Adeptus Mechanicus','Thegraffy']]}
+ k:{n:'T36 Planes or GG',p:[['Nitro','Drukhari','koji._.'],['Graffy','Adeptus Mechanicus','Thegraffy']]},
+ l:{n:'Armageddon Relics',p:[['snori','Astra Militarum','snori'],['Шрек','Orks','shefunkmyfetus']]}
 };
 
 // Solo players without a team: [in-game name, faction, Discord, note]
 const S=[
  ['OldManSart','Craftworld Aeldari','sart_rts',''],
  ['icestorm845','Adeptus Mechanicus','mothmanhighpriest',''],
- ['snori','Astra Militarum','snori',''],
  ['Кощькц','Chaos Space Marines','merzota14_79828',''],
- ['Шрек','Orks','shefunkmyfetus','']
+
 ];
 
 // Rounds: one array per round, each match [teamA, teamB, winner or '', status]
