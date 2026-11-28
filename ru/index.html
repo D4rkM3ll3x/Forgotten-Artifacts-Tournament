@@ -136,6 +136,12 @@ footer{padding:8mm 4mm}
 .mini.open{border-style:dashed}
 .empty{font-size:14px;color:var(--mute);border:1px dashed var(--edge);border-radius:8px;padding:14px}
 /* round detail */
+.qwrap{max-width:820px;margin-top:18px}
+.qboard tr.qin td.rk{box-shadow:inset 3px 0 0 var(--steel)}
+.qboard .chip{margin-top:0;white-space:nowrap}
+.chip.in{color:var(--steel);border-color:var(--steel)}
+.cutrow td{padding:0 !important;border:0 !important}
+.cutrow span{display:block;border-top:2px dashed var(--steel);color:var(--steel);font:600 12px/1 Cinzel,Forum,serif;padding:7px 0 11px}
 .rsel{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 18px}
 .rsel button{font:600 15px/1 Cinzel,Forum,serif;color:var(--mute);background:var(--box);border:1px solid var(--edge);border-radius:6px;padding:0 16px;min-height:44px;cursor:pointer}
 .rsel button[aria-pressed=true]{color:var(--bg);background:var(--ink);border-color:var(--ink)}
@@ -412,7 +418,7 @@ aside nav a:hover,aside nav a:focus-visible{border-left-color:var(--steel) !impo
  <header><div class="wrapc">
   <h1>Команды</h1>
   <p class="lead">Зарегистрированные команды · Связывайтесь с соперниками в Discord, чтобы назначить каждый матч.</p>
-  <p class="sample">Регистрация открыта · список обновляется по мере регистрации игроков</p>
+  <p class="sample">Регистрация закрыта</p>
  </div></header>
  <main class="wrapc">
   <div class="tlay">
@@ -434,12 +440,16 @@ aside nav a:hover,aside nav a:focus-visible{border-left-color:var(--steel) !impo
 <div class="view" id="v-matches" hidden>
  <header><div class="wrapc">
   <h1>Сетка и матчи</h1>
-  <p class="lead">Основной этап · швейцарская система · до пяти раундов</p>
-  <p class="sample">Пары появятся после подтверждения команд</p>
  </div></header>
  <main class="wrapc">
+  <section id="qualifier">
+   <h2>Открытая квалификация</h2>
+   <p><b>1–7 декабря.</b> Сыграйте одну или несколько игр с турнирным модом против любых зарегистрированных команд. Каждая команда должна сыграть хотя бы одну игру. 10 лучших команд проходят в основной этап, см. таблицу отбора в разделе <a href="#scoreboard">Результаты</a>.</p>
+   <div id="qlist"></div>
+   <p class="ver">Сообщайте о каждой отборочной игре со скриншотом финального экрана в ветке Forgotten Artifacts Tournament в Discord.</p>
+  </section>
   <section>
-   <h2>Швейцарская сетка</h2>
+   <h2>Основной этап · швейцарская сетка</h2>
    <p>Каждая колонка – один раунд. Команды сгруппированы по результату до раунда и играют с соперником из той же группы.</p>
    <div class="swiss" id="swiss"></div>
   </section>
@@ -455,10 +465,21 @@ aside nav a:hover,aside nav a:focus-visible{border-left-color:var(--steel) !impo
 <div class="view" id="v-scoreboard" hidden>
  <header><div class="wrapc">
   <h1>Таблица результатов</h1>
-  <p class="lead">Положение команд в основном этапе и очки стиля</p>
+  <p class="lead">Отбор, положение команд в основном этапе и очки стиля</p>
   <p class="sample">Обновляется после каждого сообщённого результата</p>
  </div></header>
  <main class="wrapc">
+  <section id="qstandings">
+   <h2>Открытая квалификация</h2>
+   <p>В основной этап проходят <span id="qcut"></span> лучших из <span id="qcount"></span> команд. В случаях ничьих за последние места решение принимает организатор.</p>
+   <div class="qwrap">
+    <div class="tbl scroll"><table class="board qboard">
+     <thead><tr><th>#</th><th>Команда</th><th class="n hm">Игры</th><th class="n">В</th><th class="n">П</th><th>Статус</th></tr></thead>
+     <tbody id="qstand"></tbody>
+    </table></div>
+    <p class="ver">Места по числу побед, затем по меньшему числу поражений.</p>
+   </div>
+  </section>
   <div class="boards">
    <section>
     <h2>Положение команд</h2>

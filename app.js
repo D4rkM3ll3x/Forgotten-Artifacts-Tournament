@@ -5,8 +5,7 @@ const lang=['ru','de'].includes(document.documentElement.lang)?document.document
 const L={
  en:{
   tbd:'TBD',notSched:'Not scheduled yet',round:'Round',
-  pairAfter:r=>'Pairings after Round '+r,awaiting:'Awaiting teams',completed:'Completed',inProgress:'In progress',
-  pairOnce:r=>'Pairings are published once Round '+r+' is complete.',
+  pairLater:'Pairings follow',qNoGame:'No game yet',qIn:'Main Event',qOut:'Out',qTie:'Tie',qCutLine:n=>'Top '+n+' advance to the Main Event',qEmpty:'No qualifier games yet. Scheduled and played games appear here.',awaiting:'Awaiting teams',completed:'Completed',inProgress:'In progress',
   team:'Team',played:'Played',open:'Open',scheduled:'Scheduled',
   pairPrev:'Pairings for this round are published once the previous round is complete.',
   standEmpty:'Standings appear here after the first results of Round 1 are reported.',
@@ -16,8 +15,7 @@ const L={
  },
  de:{
   tbd:'Offen',notSched:'Noch kein Termin',round:'Runde',
-  pairAfter:r=>'Paarungen nach Runde '+r,awaiting:'Warten auf Teams',completed:'Abgeschlossen',inProgress:'Läuft',
-  pairOnce:r=>'Paarungen erscheinen, sobald Runde '+r+' abgeschlossen ist.',
+  pairLater:'Paarungen folgen',qNoGame:'Noch kein Spiel',qIn:'Hauptturnier',qOut:'Raus',qTie:'Gleichstand',qCutLine:n=>'Die besten '+n+' ziehen ins Hauptturnier ein',qEmpty:'Noch keine Quali-Spiele. Angesetzte und gespielte Spiele erscheinen hier.',awaiting:'Warten auf Teams',completed:'Abgeschlossen',inProgress:'Läuft',
   team:'Team',played:'Gespielt',open:'Offen',scheduled:'Angesetzt',
   pairPrev:'Paarungen für diese Runde erscheinen, sobald die vorherige Runde abgeschlossen ist.',
   standEmpty:'Die Tabelle erscheint, sobald die ersten Ergebnisse aus Runde 1 gemeldet sind.',
@@ -27,8 +25,7 @@ const L={
  },
  ru:{
   tbd:'Не определено',notSched:'Время не назначено',round:'Раунд',
-  pairAfter:r=>'Пары после раунда '+r,awaiting:'Ожидание команд',completed:'Завершён',inProgress:'Идёт',
-  pairOnce:r=>'Пары публикуются после завершения раунда '+r+'.',
+  pairLater:'Пары позже',qNoGame:'Ещё не играла',qIn:'Основной этап',qOut:'Выбыла',qTie:'Ничья',qCutLine:n=>'Лучшие '+n+' проходят в основной этап',qEmpty:'Отборочных игр пока нет. Назначенные и сыгранные игры появятся здесь.',awaiting:'Ожидание команд',completed:'Завершён',inProgress:'Идёт',
   team:'Команда',played:'Сыгран',open:'Открыт',scheduled:'Назначен',
   pairPrev:'Пары этого раунда публикуются после завершения предыдущего.',
   standEmpty:'Таблица появится после первых результатов раунда 1.',
@@ -47,41 +44,71 @@ const optF=x=>opt(x&&fxn(x));
 const pl=k=>T[k].p.map(x=>x[0]+' ('+(x[1]?fxn(x[1]):'?')+')').join(' · ');
 const nm=k=>(T[k].ph?'<span class="tbdn">'+L.tbd+'</span>':esc(T[k].n))+(T[k].wc?' <span class="tag">WC</span>':'');
 const stTxt=s=>s==='Not scheduled yet'?L.notSched:s;
-// record before each round
-const rec={},form={};Object.keys(T).forEach(k=>{rec[k]=[0,0];form[k]=[]});
-const before=[];
-R.forEach(ms=>{
- const snap={};Object.keys(T).forEach(k=>snap[k]=rec[k].slice());before.push(snap);
- ms.forEach(m=>{if(!m[2])return;const w=m[2],l=m[0]===w?m[1]:m[0];rec[w][0]++;rec[l][1]++;form[w].push('W');form[l].push('L')});
-});
+// records before each round: rounds -> {rec, form, before}
+const record=rounds=>{
+ const rec={},form={},before=[];Object.keys(T).forEach(k=>{rec[k]=[0,0];form[k]=[]});
+ rounds.forEach(ms=>{
+  const snap={};Object.keys(T).forEach(k=>snap[k]=rec[k].slice());before.push(snap);
+  ms.forEach(m=>{if(!m[2])return;const w=m[2],l=m[0]===w?m[1]:m[0];rec[w][0]++;rec[l][1]++;form[w].push('W');form[l].push('L')});
+ });
+ return {rec,form,before};
+};
+const QGs=typeof QG!=='undefined'?QG:[],QC=typeof QCUT!=='undefined'?QCUT:10;
+const M=record(R),Q=record([QGs]);
+const rec=M.rec,form=M.form;
 // registered teams and solo players
 const real=Object.keys(T).filter(k=>!T[k].ph);
 document.getElementById('teams').innerHTML=real.slice().sort((x,y)=>T[x].n.localeCompare(T[y].n)).map(k=>`<div class="box tcard"><h4>${nm(k)}</h4><ul class="pl">${T[k].p.map(x=>`<li><span class="pn">${esc(x[0])}</span><span class="pf">${optF(x[1])}</span><span class="pd">${L.discord}: ${opt(x[2])}</span></li>`).join('')}</ul></div>`).join('');
 document.getElementById('tcount').textContent=real.length;
 document.getElementById('scount').textContent=S.length;
 document.getElementById('solo').innerHTML=S.length?S.map(x=>`<li><b>${esc(x[0])}</b>${x[3]?` <span class="tag">${esc(x[3])}</span>`:''}<span class="sf">${optF(x[1])}</span><span class="sd">${L.discord}: ${opt(x[2])}</span></li>`).join(''):`<li class="sd">${L.soloEmpty}</li>`;
-// swiss overview
-const sw=document.getElementById('swiss');
-sw.innerHTML=R.map((ms,i)=>{
- const status=ms.length===0?L.pairAfter(i):ms.every(m=>T[m[0]].ph)?L.awaiting:ms.every(m=>m[2])?L.completed:L.inProgress;
- if(!ms.length)return `<div class="rcol"><h4>${L.round} ${i+1}<small>${status}</small></h4><div class="empty">${L.pairOnce(i)}</div></div>`;
+// swiss columns for a set of rounds
+const swiss=(rounds,before,lab)=>rounds.map((ms,i)=>{
+ const status=ms.length===0?L.pairLater:ms.every(m=>T[m[0]].ph)?L.awaiting:ms.every(m=>m[2])?L.completed:L.inProgress;
+ if(!ms.length)return `<div class="rcol"><h4>${lab} ${i+1}<small>${status}</small></h4><div class="empty">${L.pairPrev}</div></div>`;
  const g={};ms.forEach(m=>{const r=before[i][m[0]].join('–');(g[r]=g[r]||[]).push(m)});
  const keys=Object.keys(g).sort((x,y)=>(+y.split('–')[0]-+y.split('–')[1])-(+x.split('–')[0]-+x.split('–')[1]));
- return `<div class="rcol"><h4>${L.round} ${i+1}<small>${status}</small></h4>`+keys.map(r=>`<div class="grpb"><p class="lab">${r}</p>`+g[r].map(m=>{
+ return `<div class="rcol"><h4>${lab} ${i+1}<small>${status}</small></h4>`+keys.map(r=>`<div class="grpb"><p class="lab">${r}</p>`+g[r].map(m=>{
   const row=(k,ab)=>`<div class="${m[2]?(m[2]===k?'w':'l'):''}"><span><span class="abm">${ab}</span>${T[k].ph?'<span class="tbdn">'+L.tbd+'</span>':esc(T[k].n)}</span><span class="r">${m[2]?(m[2]===k?'W':'L'):''}</span></div>`;
   return `<div class="mini${m[2]?'':' open'}">${row(m[0],'A')}${row(m[1],'B')}</div>`}).join('')+'</div>').join('')+'</div>';
 }).join('');
-// round detail
+document.getElementById('swiss').innerHTML=swiss(R,M.before,L.round);
+if(document.getElementById('qstand')){
+ // qualifier standings with cut line
+ const played=k=>Q.rec[k][0]+Q.rec[k][1];
+ const qs=real.slice().sort((x,y)=>(played(y)>0)-(played(x)>0)||Q.rec[y][0]-Q.rec[x][0]||Q.rec[x][1]-Q.rec[y][1]||T[x].n.localeCompare(T[y].n));
+ const anyQ=QGs.some(m=>m[2]);
+ const key=k=>Q.rec[k].join('-');
+ const tieKey=qs.length>QC&&played(qs[QC-1])>0&&key(qs[QC-1])===key(qs[QC])?key(qs[QC-1]):null;
+ let qr=0,qp='';
+ document.getElementById('qcount').textContent=real.length;
+ document.getElementById('qcut').textContent=QC;
+ document.getElementById('qstand').innerHTML=qs.map((k,i)=>{
+  const p=played(k);
+  if(p&&key(k)!==qp){qr=i+1;qp=key(k)}
+  const st=!p?['',L.qNoGame]:tieKey&&key(k)===tieKey?[' live',L.qTie]:i<QC?[' in',L.qIn]:[' out',L.qOut];
+  const row=`<tr class="${i<QC&&p?'qin':''}"><td class="rk">${p?qr:'–'}</td><td><span class="tm">${nm(k)}</span></td><td class="n hm">${p}</td><td class="n">${Q.rec[k][0]}</td><td class="n">${Q.rec[k][1]}</td><td><span class="chip${st[0]}">${st[1]}</span></td></tr>`;
+  return row+(anyQ&&i===QC-1&&qs.length>QC?`<tr class="cutrow"><td colspan="6"><span>${L.qCutLine(QC)}</span></td></tr>`:'');
+ }).join('');
+}
+// one match card: [teamA, teamB, winner or '', status]
+const card=m=>{
+ const done=!!m[2],side=(k,c)=>`<div class="side ${c}${done&&m[2]!==k?' lose':''}"><span class="ab">${L.team} ${c.toUpperCase()}</span><h5>${nm(k)}${done?`<span class="res ${m[2]===k?'W':'L'}">${m[2]===k?'W':'L'}</span>`:''}</h5><p>${esc(pl(k))}</p></div>`;
+ const notS=!m[3]||m[3]==='Not scheduled yet';
+ const mid=done?`<div class="mid"><div class="score">${m[2]===m[0]?'1 – 0':'0 – 1'}</div><span class="chip">${L.played}</span></div>`:`<div class="mid"><div class="score">vs</div><span class="st">${esc(stTxt(m[3]||'Not scheduled yet'))}</span><span class="chip${notS?'':' live'}">${notS?L.open:L.scheduled}</span></div>`;
+ return `<div class="match">${side(m[0],'a')}${mid}${side(m[1],'b')}</div>`;
+};
+// qualifier games: played ones first (newest last as entered), then scheduled
+const ql=document.getElementById('qlist');
+if(ql){const done=QGs.filter(m=>m[2]),open=QGs.filter(m=>!m[2]);ql.innerHTML=QGs.length?[...open,...done].map(card).join(''):Array(3).fill(['_','_','','Not scheduled yet']).map(card).join('')}
+// round detail: qualifier rounds first, then main event rounds
 const sel=document.getElementById('rsel'),list=document.getElementById('rlist');
-let cur=R.findIndex(ms=>!ms.length||ms.some(m=>!m[2]));if(cur<0)cur=R.length-1;
+const ALL=R.map((ms,i)=>({lab:L.round+' '+(i+1),ms}));
+let cur=ALL.findIndex(r=>!r.ms.length||r.ms.some(m=>!m[2]));if(cur<0)cur=ALL.length-1;
 const drawR=()=>{
- sel.innerHTML=R.map((_,i)=>`<button type="button" id="rbtn${i+1}" aria-pressed="${i===cur}" data-r="${i}">${L.round} ${i+1}</button>`).join('');
- const ms=R[cur];
- list.innerHTML=ms.length?ms.map(m=>{
-  const done=!!m[2],side=(k,c)=>`<div class="side ${c}${done&&m[2]!==k?' lose':''}"><span class="ab">${L.team} ${c.toUpperCase()}</span><h5>${nm(k)}${done?`<span class="res ${m[2]===k?'W':'L'}">${m[2]===k?'W':'L'}</span>`:''}</h5><p>${esc(pl(k))}</p></div>`;
-  const notS=m[3]==='Not scheduled yet';
-  const mid=done?`<div class="mid"><div class="score">${m[2]===m[0]?'1 – 0':'0 – 1'}</div><span class="chip">${L.played}</span></div>`:`<div class="mid"><div class="score">vs</div><span class="st">${esc(stTxt(m[3]))}</span><span class="chip${notS?'':' live'}">${notS?L.open:L.scheduled}</span></div>`;
-  return `<div class="match">${side(m[0],'a')}${mid}${side(m[1],'b')}</div>`}).join(''):`<div class="empty">${L.pairPrev}</div>`;
+ sel.innerHTML=ALL.map((r,i)=>`<button type="button" id="rbtn${i+1}" aria-pressed="${i===cur}" data-r="${i}">${r.lab}</button>`).join('');
+ const ms=ALL[cur].ms;
+ list.innerHTML=ms.length?ms.map(card).join(''):`<div class="empty">${L.pairPrev}</div>`;
 };
 sel.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;cur=+b.dataset.r;drawR()});
 drawR();

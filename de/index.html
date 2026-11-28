@@ -135,6 +135,12 @@ footer{padding:8mm 4mm}
 .mini.open{border-style:dashed}
 .empty{font-size:14px;color:var(--mute);border:1px dashed var(--edge);border-radius:8px;padding:14px}
 /* round detail */
+.qwrap{max-width:820px;margin-top:18px}
+.qboard tr.qin td.rk{box-shadow:inset 3px 0 0 var(--steel)}
+.qboard .chip{margin-top:0;white-space:nowrap}
+.chip.in{color:var(--steel);border-color:var(--steel)}
+.cutrow td{padding:0 !important;border:0 !important}
+.cutrow span{display:block;border-top:2px dashed var(--steel);color:var(--steel);font:600 12px/1 Cinzel,Forum,serif;padding:7px 0 11px}
 .rsel{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 18px}
 .rsel button{font:600 15px/1 Cinzel,serif;color:var(--mute);background:var(--box);border:1px solid var(--edge);border-radius:6px;padding:0 16px;min-height:44px;cursor:pointer}
 .rsel button[aria-pressed=true]{color:var(--bg);background:var(--ink);border-color:var(--ink)}
@@ -411,7 +417,7 @@ aside nav a:hover,aside nav a:focus-visible{border-left-color:var(--steel) !impo
  <header><div class="wrapc">
   <h1>Teams</h1>
   <p class="lead">Angemeldete Teams · Kontaktiert eure Gegner über Discord, um jedes Match zu planen.</p>
-  <p class="sample">Anmeldung offen · die Liste wird laufend aktualisiert</p>
+  <p class="sample">Anmeldung geschlossen</p>
  </div></header>
  <main class="wrapc">
   <div class="tlay">
@@ -433,12 +439,16 @@ aside nav a:hover,aside nav a:focus-visible{border-left-color:var(--steel) !impo
 <div class="view" id="v-matches" hidden>
  <header><div class="wrapc">
   <h1>Turnierbaum &amp; Matches</h1>
-  <p class="lead">Hauptturnier · Schweizer System · bis zu fünf Runden</p>
-  <p class="sample">Paarungen folgen, sobald die Teams feststehen</p>
  </div></header>
  <main class="wrapc">
+  <section id="qualifier">
+   <h2>Offene Qualifikation</h2>
+   <p><b>1.–7. Dezember.</b> Spielt ein oder mehrere Spiele mit dem Turnier-Mod gegen beliebige angemeldete Teams. Jedes Team muss mindestens ein Spiel spielen. Die 10 besten Teams ziehen ins Hauptturnier ein, siehe die Quali-Tabelle unter <a href="#scoreboard">Tabelle</a>.</p>
+   <div id="qlist"></div>
+   <p class="ver">Meldet jedes Quali-Spiel mit einem Screenshot des Endbildschirms im Forgotten-Artifacts-Tournament-Thread auf Discord.</p>
+  </section>
   <section>
-   <h2>Schweizer System</h2>
+   <h2>Hauptturnier · Schweizer System</h2>
    <p>Jede Spalte ist eine Runde. Die Teams sind nach ihrer Bilanz vor der Runde gruppiert und spielen gegen einen Gegner aus derselben Gruppe.</p>
    <div class="swiss" id="swiss"></div>
   </section>
@@ -454,10 +464,21 @@ aside nav a:hover,aside nav a:focus-visible{border-left-color:var(--steel) !impo
 <div class="view" id="v-scoreboard" hidden>
  <header><div class="wrapc">
   <h1>Tabelle</h1>
-  <p class="lead">Tabelle des Hauptturniers und Style Points</p>
+  <p class="lead">Qualifikation, Tabelle des Hauptturniers und Style Points</p>
   <p class="sample">Wird nach jedem gemeldeten Ergebnis aktualisiert</p>
  </div></header>
  <main class="wrapc">
+  <section id="qstandings">
+   <h2>Offene Qualifikation</h2>
+   <p>Die <span id="qcut"></span> besten der <span id="qcount"></span> Teams ziehen ins Hauptturnier ein. Bei Gleichstand um die letzten Plätze entscheidet der Organisator.</p>
+   <div class="qwrap">
+    <div class="tbl scroll"><table class="board qboard">
+     <thead><tr><th>#</th><th>Team</th><th class="n hm">Spiele</th><th class="n">S</th><th class="n">N</th><th>Status</th></tr></thead>
+     <tbody id="qstand"></tbody>
+    </table></div>
+    <p class="ver">Sortiert nach Siegen, dann nach weniger Niederlagen.</p>
+   </div>
+  </section>
   <div class="boards">
    <section>
     <h2>Platzierungen</h2>

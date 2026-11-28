@@ -14,18 +14,26 @@ const T={
  i:{n:'Goal: one win',p:[['Saganaki117','Space Marines','xraptor117'],['hirondelle_3000','Adeptus Mechanicus','hirondelle_3000']]},
  j:{n:'Skill Issue',p:[['M3ll3x','Drukhari','M3ll3x'],['Fuziorak','Necrons','Fuziorak'],['peppi','Adepta Sororitas','peppi33']]},
  k:{n:'T36 Planes or GG',p:[['Nitro','Drukhari','koji._.'],['Graffy','Adeptus Mechanicus','Thegraffy']]},
- l:{n:'Armageddon Relics',p:[['snori','Astra Militarum','snori'],['Шрек','Orks','shefunkmyfetus']]}
+ l:{n:'Armageddon Relics',p:[['snori','Astra Militarum','snori'],['Шрек','Orks','shefunkmyfetus']]},
+ m:{n:'GL4L',p:[['Sanyos','Space Marines','sanyos7768'],['Slickback','Necrons','.patohitler']]},
+ n:{n:'Ultrarabbis',p:[['dirolka','Adeptus Mechanicus','dirolka5361'],['Кощькц','Chaos Space Marines','merzota14_79828']]}
 };
 
 // Solo players without a team: [in-game name, faction, Discord, note]
 const S=[
  ['OldManSart','Craftworld Aeldari','sart_rts',''],
  ['icestorm845','Adeptus Mechanicus','mothmanhighpriest',''],
- ['Кощькц','Chaos Space Marines','merzota14_79828',''],
+ ['mefisto',"T'au",'mrhardcoree',''],
 
 ];
 
-// Rounds: one array per round, each match [teamA, teamB, winner or '', status]
+// Open Qualifier, 1–7 December: every game as [teamA, teamB, winner or '', status].
+// Scheduled game: winner '' and a date as status, e.g. ['a','b','','Tue 3 Dec, 19:00 CET']. Played game: ['a','b','a'].
+// Teams may play one or more games against any registered team. The best QCUT teams advance.
+const QCUT=10;
+const QG=[];
+
+// Main Event rounds: one array per round, each match [teamA, teamB, winner or '', status]
 // Use '_' as team key for a slot that is not decided yet.
 // Status 'Not scheduled yet' is translated automatically; any other text (e.g. a date) is shown as written.
 const R=[
